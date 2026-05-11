@@ -6,6 +6,8 @@ import { KeywordChip } from '@/domains/keyword/components/KeywordChip';
 import { useKeywordSelection } from '@/domains/keyword/hooks/useKeywordSelection';
 import { KEYWORDS } from '@/domains/keyword/constants/keywords';
 import { Button } from '@/shared/components/ui/button';
+import { useDailyLimit } from '@/shared/hooks/useDailyLimit';
+import { useAd } from '@/shared/hooks/useAd';
 import type { BubblePhysicsConfig, CanvasDimensions } from '@/domains/keyword/types/entity';
 
 const BUBBLE_CONFIG: BubblePhysicsConfig = {
@@ -18,6 +20,8 @@ const BUBBLE_CONFIG: BubblePhysicsConfig = {
 export function HomePage() {
   const navigate = useNavigate();
   const { state, toggleKeyword, removeKeyword } = useKeywordSelection();
+  const { canUse, remaining, increment, addRewardedUse, isPremium } = useDailyLimit();
+  const { showRewardedAd } = useAd();
 
   const keywordLabels = useMemo(() => KEYWORDS.map(k => k.label), []);
 
@@ -29,8 +33,19 @@ export function HomePage() {
     [],
   );
 
-  const handleRecommend = () => {
-    navigate('/player', { state: { keywords: state.selected } });
+  const handleRecommend = async () => {
+    if (canUse) {
+      increment();
+      navigate('/player', { state: { keywords: state.selected } });
+      return;
+    }
+
+    const rewarded = await showRewardedAd();
+    if (rewarded) {
+      addRewardedUse();
+      increment();
+      navigate('/player', { state: { keywords: state.selected } });
+    }
   };
 
   return (
@@ -54,8 +69,10 @@ export function HomePage() {
 
         <SelectionGuide selectedCount={state.selected.length} />
 
+        {!isPremium && <p className="text-center text-sm text-muted-foreground mt-2">오늘 {remaining}회 남음</p>}
+
         <Button size="lg" className="w-full mt-3" disabled={!state.canRecommend} onClick={handleRecommend}>
-          추천 받기
+          {canUse ? '추천 받기' : '광고 보고 추천 받기'}
         </Button>
       </div>
     </div>
