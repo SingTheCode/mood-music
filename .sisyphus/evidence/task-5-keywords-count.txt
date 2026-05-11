@@ -1,0 +1,13 @@
+=== Keyword Count and Categories ===
+Total keywords: 36
+Categories: 감정, 상황, 날씨, 시간, 에너지
+
+=== Category Breakdown ===
+- 감정 (emotion): 10 keywords
+- 상황 (situation): 10 keywords  
+- 날씨 (weather): 4 keywords
+- 시간 (time): 4 keywords
+- 에너지 (vibe): 8 keywords
+
+=== TypeScript Compilation ===
+Exit code: 0

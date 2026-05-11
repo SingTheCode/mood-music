@@ -1,0 +1,78 @@
+{
+  "kind": "youtube#searchListResponse",
+  "etag": "test-etag-abc123",
+  "nextPageToken": "CAUQAA",
+  "regionCode": "KR",
+  "pageInfo": {
+    "totalResults": 1000000,
+    "resultsPerPage": 5
+  },
+  "items": [
+    {
+      "kind": "youtube#searchResult",
+      "etag": "item-etag-1",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "dQw4w9WgXcQ"
+      },
+      "snippet": {
+        "publishedAt": "2009-10-25T06:57:33Z",
+        "channelId": "UCuAXFkgsw1L7xaCfnd5JJOw",
+        "title": "Lo-fi Chill Beats",
+        "description": "Relaxing lo-fi music for studying and working",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "Chill Music Channel",
+        "liveBroadcastContent": "none"
+      }
+    },
+    {
+      "kind": "youtube#searchResult",
+      "etag": "item-etag-2",
+      "id": {
+        "kind": "youtube#video",
+        "videoId": "jNQXAC9IVRw"
+      },
+      "snippet": {
+        "publishedAt": "2005-04-23T21:58:02Z",
+        "channelId": "UCkRfArvrzheW2E7b6SVV7vA",
+        "title": "Me at the zoo",
+        "description": "The first YouTube video ever uploaded",
+        "thumbnails": {
+          "default": {
+            "url": "https://i.ytimg.com/vi/jNQXAC9IVRw/default.jpg",
+            "width": 120,
+            "height": 90
+          },
+          "medium": {
+            "url": "https://i.ytimg.com/vi/jNQXAC9IVRw/mqdefault.jpg",
+            "width": 320,
+            "height": 180
+          },
+          "high": {
+            "url": "https://i.ytimg.com/vi/jNQXAC9IVRw/hqdefault.jpg",
+            "width": 480,
+            "height": 360
+          }
+        },
+        "channelTitle": "jawed",
+        "liveBroadcastContent": "none"
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+=== shadcn/ui Components Installed ===
+badge.tsx
+button.tsx
+card.tsx
+dialog.tsx
+sheet.tsx
+skeleton.tsx
+
+=== TypeScript Compilation ===
+Exit code: 0

@@ -1,0 +1,24 @@
+=== Server .env.example ===
+# YouTube Data API v3
+# Get from: https://console.cloud.google.com/apis/credentials
+YOUTUBE_API_KEY=your_youtube_api_key_here
+
+# OpenAI API Key
+# Get from: https://platform.openai.com/api-keys
+LLM_API_KEY=your_openai_api_key_here
+
+# LLM Model (default: gpt-4o-mini)
+LLM_MODEL=gpt-4o-mini
+
+# Server Port (default: 3000)
+PORT=3000
+
+=== Client .env.example ===
+# API Base URL for backend
+# Development: http://localhost:3000
+# Production: https://api.mood-music.com
+VITE_API_BASE_URL=http://localhost:3000
+
+=== Variable Count ===
+Server variables: 4
+Client variables: 1
