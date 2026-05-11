@@ -2,6 +2,56 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { YoutubeVideo } from '@mood-music/shared-types';
 
 /**
+ * YouTube 검색 결과 아이템 인터페이스
+ */
+interface YouTubeSearchItem {
+  /** Video ID information */
+  id: { videoId: string };
+  /** Video snippet metadata */
+  snippet: {
+    /** Video title */
+    title: string;
+    /** Channel name */
+    channelTitle: string;
+    /** Thumbnail URLs */
+    thumbnails?: {
+      /** High resolution thumbnail */
+      high?: { url: string };
+      /** Default thumbnail */
+      default?: { url: string };
+    };
+  };
+}
+
+/**
+ * YouTube API 클라이언트 인터페이스
+ */
+interface YouTubeClient {
+  /** Search API */
+  search: {
+    /**
+     * Search for videos
+     * @param params Search parameters
+     * @returns Search results
+     */
+    list: (params: {
+      /** API part (snippet, etc.) */
+      part: string;
+      /** Search query */
+      q: string;
+      /** Resource type (video, etc.) */
+      type: string;
+      /** Video category ID */
+      videoCategoryId: string;
+      /** Maximum results to return */
+      maxResults: number;
+      /** Sort order */
+      order: string;
+    }) => Promise<{ data: { items: YouTubeSearchItem[] } }>;
+  };
+}
+
+/**
  * YouTube 검색 서비스
  * YouTube Data API v3를 통해 음악 영상을 검색합니다.
  */
@@ -10,7 +60,7 @@ export class YouTubeService {
   private cache = new Map<string, { result: YoutubeVideo[]; timestamp: number }>();
   private readonly CACHE_TTL = 30 * 60 * 1000; // 30분
 
-  constructor(@Inject('YOUTUBE_CLIENT') private youtubeClient: any) {}
+  constructor(@Inject('YOUTUBE_CLIENT') private youtubeClient: YouTubeClient) {}
 
   /**
    * YouTube에서 음악 영상을 검색합니다.
@@ -39,12 +89,12 @@ export class YouTubeService {
       const videos = this.parseSearchResults(response.data.items || []);
       this.cache.set(cacheKey, { result: videos, timestamp: Date.now() });
       return videos;
-    } catch (error) {
+    } catch {
       return [];
     }
   }
 
-  private parseSearchResults(items: any[]): YoutubeVideo[] {
+  private parseSearchResults(items: YouTubeSearchItem[]): YoutubeVideo[] {
     return items
       .filter(item => item.id?.videoId)
       .map(item => ({

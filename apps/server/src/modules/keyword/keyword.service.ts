@@ -2,6 +2,34 @@ import { Injectable, Inject } from '@nestjs/common';
 import type { ExpandKeywordsResponse } from '@mood-music/shared-types';
 
 /**
+ * OpenAI API 클라이언트 인터페이스
+ */
+interface OpenAiClient {
+  /** Chat completions API */
+  chat: {
+    /** Completions endpoint */
+    completions: {
+      /**
+       * Create a chat completion
+       * @param params Request parameters
+       * @returns Completion response
+       */
+      create: (params: {
+        /** Model identifier */
+        model: string;
+        /** Message history */
+        messages: { role: string; content: string }[];
+        /** Maximum tokens to generate */
+        max_tokens?: number;
+      }) => Promise<{
+        /** Response choices */
+        choices: { message: { content: string | null } }[];
+      }>;
+    };
+  };
+}
+
+/**
  * 키워드 확장 서비스
  * LLM을 사용하여 감정 키워드를 YouTube 검색 쿼리로 변환합니다.
  */
@@ -11,7 +39,7 @@ export class KeywordService {
   private readonly CACHE_TTL = 24 * 60 * 60 * 1000; // 24시간
   private readonly LLM_TIMEOUT = 2000; // 2초
 
-  constructor(@Inject('OPENAI_CLIENT') private openaiClient: any) {}
+  constructor(@Inject('OPENAI_CLIENT') private openaiClient: OpenAiClient) {}
 
   /**
    * 감정 키워드를 YouTube 검색 쿼리로 확장합니다.
@@ -32,7 +60,7 @@ export class KeywordService {
       const result: ExpandKeywordsResponse = { query };
       this.cache.set(cacheKey, { result, timestamp: Date.now() });
       return result;
-    } catch (error) {
+    } catch {
       const query = this.getFallbackQuery(keywords);
       return { query };
     }
@@ -61,7 +89,8 @@ Requirements:
       });
 
       clearTimeout(timeoutId);
-      return response.choices[0].message.content.trim();
+      const content = response.choices[0]?.message.content;
+      return (content ?? '').trim();
     } catch (error) {
       clearTimeout(timeoutId);
       throw error;
@@ -83,7 +112,7 @@ Requirements:
     };
 
     const genres = keywords
-      .map(k => genreMap[k] || 'music')
+      .map(keyword => genreMap[keyword] || 'music')
       .slice(0, 2)
       .join(' ');
 
