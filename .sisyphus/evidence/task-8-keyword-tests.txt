@@ -1,0 +1,12 @@
+PASS src/modules/keyword/keyword.service.spec.ts
+  KeywordService
+    expandKeywords
+      ✓ should return expanded keywords from LLM (6 ms)
+      ✓ should return cached result on second call (1 ms)
+      ✓ should return fallback on LLM error (2 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        1.254 s, estimated 2 s
+Ran all test suites matching /keyword.service.spec/i.
