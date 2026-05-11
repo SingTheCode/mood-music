@@ -1,9 +1,10 @@
-import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
-import { KeywordModule } from "./modules/keyword/keyword.module";
-import { YoutubeModule } from "./modules/youtube/youtube.module";
-import { HistoryModule } from "./modules/history/history.module";
-import configuration from "./config/configuration";
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './modules/auth/auth.module';
+import { KeywordModule } from './modules/keyword/keyword.module';
+import { YoutubeModule } from './modules/youtube/youtube.module';
+import { HistoryModule } from './modules/history/history.module';
+import configuration from './config/configuration';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import configuration from "./config/configuration";
       isGlobal: true,
       load: [configuration],
     }),
+    AuthModule,
     KeywordModule,
     YoutubeModule,
     HistoryModule,

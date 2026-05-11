@@ -1,0 +1,12 @@
+PASS src/modules/auth/auth.guard.spec.ts
+  AuthGuard
+    canActivate
+      ✓ should allow request with valid user ID (5 ms)
+      ✓ should throw UnauthorizedException when x-user-id header is missing (5 ms)
+      ✓ should throw UnauthorizedException when x-user-id is empty string (1 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        1.255 s
+Ran all test suites matching /auth.guard.spec/i.
