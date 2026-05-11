@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { YouTubePlayer } from '@/domains/player/components/YouTubePlayer';
 import { PlaylistTrackList } from '@/domains/player/components/PlaylistTrackList';
@@ -12,7 +12,7 @@ import type { FeedbackReaction } from '@/../../../packages/shared-types/src/feed
 export function PlayerPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const keywords: string[] = location.state?.keywords ?? [];
+  const keywords: string[] = useMemo(() => location.state?.keywords ?? [], [location.state?.keywords]);
 
   const { data, isLoading, isError } = usePlaylistSearch(keywords);
   const { saveEntry } = useHistory();

@@ -112,6 +112,8 @@ export function FloatingBubble({ keywords, selected, onSelect, config, canvasDim
 
     renderFrame();
 
+    const bodiesMap = bodiesRef.current;
+
     return () => {
       canvas.removeEventListener('click', handleCanvasClick);
       if (runnerRef.current) {
@@ -120,7 +122,7 @@ export function FloatingBubble({ keywords, selected, onSelect, config, canvasDim
       if (engineRef.current) {
         Matter.Engine.clear(engineRef.current);
       }
-      bodiesRef.current.clear();
+      bodiesMap.clear();
     };
   }, [keywords, config, canvasDimensions, onSelect, selected]);
 
