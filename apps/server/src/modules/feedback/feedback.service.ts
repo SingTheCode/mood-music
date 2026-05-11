@@ -17,13 +17,16 @@ export class FeedbackService {
    * @param feedback 피드백 데이터
    * @returns 저장된 피드백
    */
-  async saveFeedback(
-    userId: string,
-    feedback: Omit<FeedbackEntry, 'id' | 'createdAt'>,
-  ): Promise<FeedbackEntry> {
+  async saveFeedback(userId: string, feedback: FeedbackEntry): Promise<FeedbackEntry> {
     if (!this.VALID_REACTIONS.includes(feedback.reaction)) {
       throw new BadRequestException(`Invalid reaction: ${feedback.reaction}`);
     }
+
+    this.feedbacks.push(feedback);
+    return feedback;
+  }
+}
+
 
     const entry: FeedbackEntry = {
       id: crypto.randomUUID(),

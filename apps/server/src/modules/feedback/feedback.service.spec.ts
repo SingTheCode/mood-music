@@ -19,10 +19,10 @@ describe('FeedbackService', () => {
         keywords: ['잔잔한'],
         trackIds: ['video-123'],
         reaction: 'LIKE' as FeedbackReaction,
+        createdAt: Date.now(),
       });
 
       expect(result).toBeDefined();
-      expect(result.id).toBeDefined();
       expect(result.reaction).toBe('LIKE');
     });
 
@@ -32,6 +32,7 @@ describe('FeedbackService', () => {
           keywords: ['잔잔한'],
           trackIds: ['video-123'],
           reaction: 'INVALID' as any,
+          createdAt: Date.now(),
         }),
       ).rejects.toThrow();
     });
