@@ -30,9 +30,9 @@ export function generateInitialBubblePositions(
     let attempts = 0;
 
     while (!position && attempts < config.maxPositionAttempts) {
-      const x = minX + Math.random() * (maxX - minX);
-      const y = minY + Math.random() * (maxY - minY);
-      const candidate = { x, y };
+      const posX = minX + Math.random() * (maxX - minX);
+      const posY = minY + Math.random() * (maxY - minY);
+      const candidate = { x: posX, y: posY };
 
       const hasOverlap = positions.some(existing => {
         const dx = existing.x - candidate.x;

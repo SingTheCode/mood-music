@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { searchPlaylist } from '../apis/playlistApi';
-import { playerKeys } from '../constants/queryKeys';
-import type { SearchResult } from '../types/entity';
+import { searchPlaylist } from '@/domains/player/apis/playlistApi';
+import { playerKeys } from '@/domains/player/constants/queryKeys';
+import type { SearchResult } from '@/domains/player/types/entity';
 
 /**
  * Hook for searching and fetching playlists based on keywords

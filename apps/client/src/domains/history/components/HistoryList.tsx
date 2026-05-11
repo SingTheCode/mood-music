@@ -1,6 +1,6 @@
 import { Trash2 } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
-import type { HistoryEntry } from '../types/entity';
+import type { HistoryEntry } from '@/domains/history/types/entity';
 
 interface HistoryListProps {
   /** Array of history entries to display */
@@ -52,8 +52,8 @@ export function HistoryList({ entries, onSelectEntry, onDeleteEntry }: HistoryLi
               variant="ghost"
               size="sm"
               className="flex-shrink-0 text-red-600 hover:bg-red-50"
-              onClick={e => {
-                e.stopPropagation();
+              onClick={event => {
+                event.stopPropagation();
                 onDeleteEntry(entry.id);
               }}
             >

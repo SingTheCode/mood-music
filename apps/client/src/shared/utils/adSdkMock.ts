@@ -28,7 +28,7 @@ export class AdSdkMock {
    * @returns 로딩 성공 여부
    */
   async loadRewardedAd(): Promise<boolean> {
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(resolve => setTimeout(resolve, 500));
     return true;
   }
 
@@ -37,7 +37,7 @@ export class AdSdkMock {
    * @returns 보상 지급 결과
    */
   async showRewardedAd(): Promise<RewardedAdResult> {
-    await new Promise(r => setTimeout(r, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     return { rewarded: true };
   }
 
@@ -46,7 +46,7 @@ export class AdSdkMock {
    * @returns 로딩 성공 여부
    */
   async loadInterstitialAd(): Promise<boolean> {
-    await new Promise(r => setTimeout(r, 300));
+    await new Promise(resolve => setTimeout(resolve, 300));
     return true;
   }
 
@@ -54,7 +54,7 @@ export class AdSdkMock {
    * 전면 광고를 표시한다.
    */
   async showInterstitialAd(): Promise<void> {
-    await new Promise(r => setTimeout(r, 800));
+    await new Promise(resolve => setTimeout(resolve, 800));
   }
 }
 

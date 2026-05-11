@@ -1,4 +1,4 @@
-import type { Track } from '../types/entity';
+import type { Track } from '@/domains/player/types/entity';
 
 interface YouTubePlayerProps {
   /** Array of tracks to play */

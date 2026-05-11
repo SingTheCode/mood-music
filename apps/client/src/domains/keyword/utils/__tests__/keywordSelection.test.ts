@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { addKeywordSelection, removeKeywordSelection, canRecommend, getSelectedKeywords } from '../keywordSelection';
+import {
+  addKeywordSelection,
+  removeKeywordSelection,
+  canRecommend,
+  getSelectedKeywords,
+} from '@/domains/keyword/utils/keywordSelection';
 
 describe('keywordSelection', () => {
   describe('addKeywordSelection', () => {

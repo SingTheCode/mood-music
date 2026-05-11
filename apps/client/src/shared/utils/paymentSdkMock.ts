@@ -18,7 +18,7 @@ export class PaymentSdkMock {
    */
   async purchase(productId: string): Promise<PurchaseResult> {
     void productId;
-    await new Promise(r => setTimeout(r, 1500));
+    await new Promise(resolve => setTimeout(resolve, 1500));
     return { success: true, transactionId: `mock-txn-${Date.now()}` };
   }
 

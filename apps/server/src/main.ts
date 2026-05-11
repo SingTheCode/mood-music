@@ -1,11 +1,11 @@
-import { NestFactory } from "@nestjs/core";
-import { ValidationPipe } from "@nestjs/common";
-import { AppModule } from "./app.module";
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.setGlobalPrefix("api");
+  app.setGlobalPrefix('api');
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -14,7 +14,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: "http://localhost:5173",
+    origin: 'http://localhost:5173',
   });
 
   await app.listen(3000);

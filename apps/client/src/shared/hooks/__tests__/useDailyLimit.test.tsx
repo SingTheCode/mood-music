@@ -1,11 +1,11 @@
 import { renderHook, act } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useDailyLimit } from '../useDailyLimit';
+import { useDailyLimit } from '@/shared/hooks/useDailyLimit';
 
 const DAILY_LIMIT_KEY = 'mood-music-daily-limit';
 
-vi.mock('../useSubscription', () => ({
+vi.mock('@/shared/hooks/useSubscription', () => ({
   useSubscription: vi.fn(() => ({
     tier: 'FREE',
     isPremium: false,
@@ -14,7 +14,7 @@ vi.mock('../useSubscription', () => ({
   })),
 }));
 
-import { useSubscription } from '../useSubscription';
+import { useSubscription } from '@/shared/hooks/useSubscription';
 
 const mockUseSubscription = vi.mocked(useSubscription);
 

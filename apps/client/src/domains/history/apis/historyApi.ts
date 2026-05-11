@@ -1,4 +1,4 @@
-import type { HistoryEntry, HistoryFilter } from '../types/entity';
+import type { HistoryEntry, HistoryFilter } from '@/domains/history/types/entity';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
@@ -7,8 +7,12 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000
  */
 export async function fetchHistory(filter?: HistoryFilter): Promise<HistoryEntry[]> {
   const params = new URLSearchParams();
-  if (filter?.limit) params.append('limit', String(filter.limit));
-  if (filter?.offset) params.append('offset', String(filter.offset));
+  if (filter?.limit) {
+    params.append('limit', String(filter.limit));
+  }
+  if (filter?.offset) {
+    params.append('offset', String(filter.offset));
+  }
 
   const response = await fetch(`${API_BASE_URL}/history?${params.toString()}`, {
     method: 'GET',

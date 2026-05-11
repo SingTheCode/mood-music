@@ -1,4 +1,4 @@
-import type { HistoryEntry } from '../types/entity';
+import type { HistoryEntry } from '@/domains/history/types/entity';
 
 interface HistoryCardProps {
   /** The history entry to display */

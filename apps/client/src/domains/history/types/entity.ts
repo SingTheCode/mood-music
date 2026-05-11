@@ -7,12 +7,12 @@ export interface HistoryEntry {
   /** Keywords that were selected */
   keywords: string[];
   /** Tracks that were recommended */
-  tracks: Array<{
+  tracks: {
     /** YouTube video ID */
     videoId: string;
     /** Video title */
     title: string;
-  }>;
+  }[];
   /** Timestamp when this entry was created */
   createdAt: string;
   /** Optional user feedback on the recommendation */

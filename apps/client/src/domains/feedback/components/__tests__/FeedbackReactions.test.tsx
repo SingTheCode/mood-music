@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { FeedbackReactions } from '../FeedbackReactions';
+import { FeedbackReactions } from '@/domains/feedback/components/FeedbackReactions';
 import { FeedbackReaction } from '@/../../../packages/shared-types/src/feedback';
 
 describe('FeedbackReactions', () => {

@@ -14,6 +14,6 @@ export class AuthService {
   validateUserId(userId: string): boolean {
     // MVP: 단순히 존재 여부만 확인
     // 실제 앱인토스 SDK 검증은 인터페이스로 추상화하여 Mock 가능하게 함
-    return !!(userId && typeof userId === 'string' && userId.trim().length > 0);
+    return Boolean(userId && typeof userId === 'string' && userId.trim().length > 0);
   }
 }

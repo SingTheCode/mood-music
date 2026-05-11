@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
-import { HistoryList } from '../HistoryList';
-import type { HistoryEntry } from '../../types/entity';
+import { HistoryList } from '@/domains/history/components/HistoryList';
+import type { HistoryEntry } from '@/domains/history/types/entity';
 
 describe('HistoryList', () => {
   const mockEntries: HistoryEntry[] = [

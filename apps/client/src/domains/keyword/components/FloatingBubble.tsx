@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import * as Matter from 'matter-js';
-import { generateInitialBubblePositions, calculateBubbleScale } from '../utils/bubblePhysics';
-import type { BubblePhysicsConfig, CanvasDimensions } from '../types/entity';
+import { generateInitialBubblePositions, calculateBubbleScale } from '@/domains/keyword/utils/bubblePhysics';
+import type { BubblePhysicsConfig, CanvasDimensions } from '@/domains/keyword/types/entity';
 
 interface FloatingBubbleProps {
   /** Array of keyword strings to display as bubbles */
@@ -26,11 +26,15 @@ export function FloatingBubble({ keywords, selected, onSelect, config, canvasDim
   const runnerRef = useRef<Matter.Runner | null>(null);
 
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!canvasRef.current) {
+      return;
+    }
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      return;
+    }
 
     const engine = Matter.Engine.create();
     engineRef.current = engine;
@@ -44,7 +48,9 @@ export function FloatingBubble({ keywords, selected, onSelect, config, canvasDim
 
     keywords.forEach((keyword, index) => {
       const pos = positions[index];
-      if (!pos) return;
+      if (!pos) {
+        return;
+      }
 
       const body = Matter.Bodies.circle(pos.x, pos.y, config.bubbleRadius, {
         restitution: 0.8,
@@ -59,12 +65,12 @@ export function FloatingBubble({ keywords, selected, onSelect, config, canvasDim
 
     const handleCanvasClick = (event: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
+      const clickX = event.clientX - rect.left;
+      const clickY = event.clientY - rect.top;
 
       bodiesRef.current.forEach((body, keyword) => {
-        const dx = body.position.x - x;
-        const dy = body.position.y - y;
+        const dx = body.position.x - clickX;
+        const dy = body.position.y - clickY;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance < config.bubbleRadius * 1.2) {

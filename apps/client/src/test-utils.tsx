@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, RenderOptions } from '@testing-library/react';
-import { ReactElement } from 'react';
+import { ReactElement, type ReactNode } from 'react';
 
 /**
  * 테스트용 QueryClient를 생성합니다.
@@ -20,7 +20,7 @@ export function createTestQueryClient() {
  */
 export function createWrapper() {
   const client = createTestQueryClient();
-  return function Wrapper({ children }: { children: React.ReactNode }) {
+  return function Wrapper({ children }: { children: ReactNode }) {
     return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
   };
 }

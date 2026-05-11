@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render } from '@testing-library/react';
-import { YouTubePlayer } from '../YouTubePlayer';
-import type { Track } from '../../types/entity';
+import { YouTubePlayer } from '@/domains/player/components/YouTubePlayer';
+import type { Track } from '@/domains/player/types/entity';
 
 describe('YouTubePlayer', () => {
   const mockTracks: Track[] = [

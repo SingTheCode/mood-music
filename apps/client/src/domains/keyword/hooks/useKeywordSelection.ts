@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { addKeywordSelection, removeKeywordSelection, canRecommend } from '../utils/keywordSelection';
-import type { KeywordSelectionState } from '../types/entity';
+import { addKeywordSelection, removeKeywordSelection, canRecommend } from '@/domains/keyword/utils/keywordSelection';
+import type { KeywordSelectionState } from '@/domains/keyword/types/entity';
 
 /**
  * Hook for managing keyword selection state

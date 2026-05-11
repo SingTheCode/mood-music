@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchHistory, saveHistoryEntry, deleteHistoryEntry } from '../apis/historyApi';
-import { historyKeys } from '../constants/queryKeys';
-import type { HistoryEntry, HistoryFilter } from '../types/entity';
+import { fetchHistory, saveHistoryEntry, deleteHistoryEntry } from '@/domains/history/apis/historyApi';
+import { historyKeys } from '@/domains/history/constants/queryKeys';
+import type { HistoryEntry, HistoryFilter } from '@/domains/history/types/entity';
 
 /**
  * Hook for managing user history entries

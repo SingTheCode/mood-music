@@ -23,7 +23,7 @@ export function HomePage() {
   const { canUse, remaining, increment, addRewardedUse, isPremium } = useDailyLimit();
   const { showRewardedAd } = useAd();
 
-  const keywordLabels = useMemo(() => KEYWORDS.map(k => k.label), []);
+  const keywordLabels = useMemo(() => KEYWORDS.map(keyword => keyword.label), []);
 
   const canvasDimensions: CanvasDimensions = useMemo(
     () => ({

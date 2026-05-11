@@ -1,11 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useHistory } from '../useHistory';
-import * as historyApi from '../../apis/historyApi';
-import type { HistoryEntry } from '../../types/entity';
+import { useHistory } from '@/domains/history/hooks/useHistory';
+import * as historyApi from '@/domains/history/apis/historyApi';
+import type { HistoryEntry } from '@/domains/history/types/entity';
+import type { ReactNode } from 'react';
 
-vi.mock('../../apis/historyApi');
+vi.mock('@/domains/history/apis/historyApi');
 
 describe('useHistory', () => {
   let queryClient: QueryClient;
@@ -19,7 +20,7 @@ describe('useHistory', () => {
     vi.clearAllMocks();
   });
 
-  const wrapper = ({ children }: { children: React.ReactNode }) => (
+  const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
 

@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { generateInitialBubblePositions, detectBoundaryCollision, calculateBubbleScale } from '../bubblePhysics';
-import type { CanvasDimensions, BubblePhysicsConfig } from '../../types/entity';
+import {
+  generateInitialBubblePositions,
+  detectBoundaryCollision,
+  calculateBubbleScale,
+} from '@/domains/keyword/utils/bubblePhysics';
+import type { CanvasDimensions, BubblePhysicsConfig } from '@/domains/keyword/types/entity';
 
 describe('bubblePhysics', () => {
   const defaultConfig: BubblePhysicsConfig = {
@@ -54,7 +58,9 @@ describe('bubblePhysics', () => {
         for (let j = i + 1; j < positions.length; j++) {
           const posI = positions[i];
           const posJ = positions[j];
-          if (!posI || !posJ) continue;
+          if (!posI || !posJ) {
+            continue;
+          }
 
           const dx = posI.x - posJ.x;
           const dy = posI.y - posJ.y;
