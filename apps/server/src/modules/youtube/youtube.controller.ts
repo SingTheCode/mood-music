@@ -1,12 +1,12 @@
-import { Controller, Get, Query } from "@nestjs/common";
-import { YoutubeService } from "./youtube.service";
+import { Controller, Get, Query } from '@nestjs/common';
+import { YouTubeService } from './youtube.service';
 
-@Controller("youtube")
+@Controller('youtube')
 export class YoutubeController {
-  constructor(private readonly youtubeService: YoutubeService) {}
+  constructor(private readonly youtubeService: YouTubeService) {}
 
-  @Get("search")
-  search(@Query("q") query: string) {
-    return this.youtubeService.searchVideos(query);
+  @Get('search')
+  search(@Query('q') query: string) {
+    return this.youtubeService.search(query);
   }
 }

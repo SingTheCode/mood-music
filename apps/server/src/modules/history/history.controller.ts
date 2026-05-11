@@ -1,17 +1,21 @@
-import { Controller, Get, Post, Body } from "@nestjs/common";
-import { HistoryService } from "./history.service";
+import { Controller, Get, Post, Body, Headers } from '@nestjs/common';
+import { HistoryService } from './history.service';
 
-@Controller("history")
+@Controller('history')
 export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
 
   @Get()
-  findAll() {
-    return this.historyService.findAll();
+  findAll(@Headers('x-user-id') userId: string) {
+    return this.historyService.getByUserId(userId || 'anonymous');
   }
 
   @Post()
-  create(@Body() body: { keywords: string[]; playlistId: string }) {
-    return this.historyService.create(body.keywords, body.playlistId);
+  create(@Headers('x-user-id') userId: string, @Body() body: { keywords: string[]; playlistId: string }) {
+    return this.historyService.saveEntry(userId || 'anonymous', {
+      keywords: body.keywords,
+      playlistId: body.playlistId,
+      createdAt: new Date().toISOString(),
+    });
   }
 }
