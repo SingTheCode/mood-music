@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>무드뮤직 — 감정 키워드 기반 음악 추천 서비스 기획</title>
+<style>
+:root {
+    --ivory: #FAF9F5;
+    --slate: #141413;
+    --clay: #D97757;
+    --oat: #E3DACC;
+    --olive: #788C5D;
+    --rust: #B04A3F;
+    --gray-100: #F0EEE6;
+    --gray-300: #D1CFC5;
+    --gray-500: #87867F;
+    --gray-700: #3D3D3A;
+    --white: #FFFFFF;
+    --serif: ui-serif, Georgia, serif;
+    --sans: system-ui, -apple-system, sans-serif;
+    --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--sans); font-size: 15px; line-height: 1.6; color: var(--gray-700); background: var(--ivory); }
+.container { max-width: 860px; margin: 0 auto; padding: 56px 24px 80px; }
+header { margin-bottom: 40px; }
+header h1 { font-family: var(--serif); font-size: 32px; font-weight: 500; color: var(--slate); letter-spacing: -0.02em; margin-bottom: 6px; }
+.subtitle { color: var(--gray-500); font-size: 14px; font-family: var(--mono); letter-spacing: 0.02em; }
+.tab-nav { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1.5px solid var(--gray-300); margin-bottom: 40px; scrollbar-width: none; }
+.tab-nav::-webkit-scrollbar { display: none; }
+.tab-btn { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; padding: 10px 14px; border: none; background: none; color: var(--gray-500); cursor: pointer; white-space: nowrap; border-bottom: 2px solid transparent; margin-bottom: -1.5px; transition: color 0.15s, border-color 0.15s; }
+.tab-btn:hover { color: var(--slate); }
+.tab-btn.active { color: var(--clay); border-bottom-color: var(--clay); font-weight: 600; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+h2 { font-family: var(--serif); font-size: 22px; font-weight: 500; color: var(--slate); letter-spacing: -0.01em; margin: 48px 0 16px; }
+h2:first-child { margin-top: 0; }
+h3 { font-family: var(--sans); font-size: 16px; font-weight: 600; color: var(--slate); margin: 28px 0 10px; }
+h4 { font-size: 14px; font-weight: 600; color: var(--gray-700); margin: 18px 0 8px; }
+p { margin: 10px 0; }
+ul, ol { margin: 10px 0; padding-left: 24px; }
+li { margin: 4px 0; }
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+th { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; text-align: left; padding: 10px 12px; background: var(--gray-100); color: var(--gray-500); border-bottom: 1.5px solid var(--gray-300); }
+td { padding: 10px 12px; border-bottom: 1px solid var(--gray-100); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+.card { background: var(--white); border: 1.5px solid var(--gray-300); border-radius: 12px; padding: 20px; margin: 16px 0; }
+.card-accent { border-left: 4px solid var(--clay); }
+.card-olive { border-left: 4px solid var(--olive); }
+.badge { display: inline-block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: var(--gray-100); color: var(--gray-500); }
+.badge-ok { background: #eef5e8; color: var(--olive); }
+.badge-warn { background: #fef3e7; color: var(--rust); }
+.badge-clay { background: #fdf0eb; color: var(--clay); }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin: 20px 0; }
+.stat-card { background: var(--white); border: 1.5px solid var(--gray-300); border-radius: 12px; padding: 16px; text-align: center; }
+.stat-card .number { font-family: var(--serif); font-size: 28px; color: var(--slate); font-weight: 500; }
+.stat-card .label { font-family: var(--mono); font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 4px; }
+.flow-diagram { background: var(--white); border: 1.5px solid var(--gray-300); border-radius: 12px; padding: 24px; margin: 20px 0; overflow-x: auto; }
+.flow-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; font-family: var(--mono); font-size: 12px; }
+.flow-box { background: var(--gray-100); border: 1px solid var(--gray-300); border-radius: 8px; padding: 8px 14px; white-space: nowrap; }
+.flow-box.highlight { background: #fdf0eb; border-color: var(--clay); color: var(--clay); font-weight: 600; }
+.flow-arrow { color: var(--gray-500); font-size: 16px; }
+.roadmap { border-left: 3px solid var(--clay); padding-left: 24px; margin: 20px 0; }
+.roadmap-phase { margin-bottom: 24px; }
+.roadmap-phase h4 { color: var(--clay); margin-bottom: 6px; }
+.roadmap-phase ul { margin: 0; padding-left: 18px; }
+.perspective-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 20px 0; }
+.perspective-card { background: var(--white); border: 1.5px solid var(--gray-300); border-radius: 12px; padding: 18px; }
+.perspective-card h4 { margin-top: 0; color: var(--clay); }
+.perspective-card ol { padding-left: 18px; font-size: 14px; }
+code { font-family: var(--mono); font-size: 13px; background: var(--gray-100); padding: 2px 6px; border-radius: 4px; color: var(--slate); }
+blockquote { border-left: 3px solid var(--clay); padding: 12px 16px; margin: 16px 0; background: var(--gray-100); border-radius: 0 8px 8px 0; font-style: italic; color: var(--gray-700); }
+@media (max-width: 640px) {
+    .container { padding: 32px 16px 60px; }
+    header h1 { font-size: 24px; }
+    h2 { font-size: 18px; }
+    .tab-btn { font-size: 10px; padding: 8px 10px; }
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .perspective-grid { grid-template-columns: 1fr; }
+    .flow-row { font-size: 11px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>무드뮤직</h1>
+        <p class="subtitle">감정 키워드 기반 음악 추천 · 앱인토스 미니앱</p>
+    </header>
+
+    <nav class="tab-nav" aria-label="섹션 탭">
+        <button class="tab-btn active" data-tab="overview">개요</button>
+        <button class="tab-btn" data-tab="features">핵심 기능</button>
+        <button class="tab-btn" data-tab="architecture">아키텍처</button>
+        <button class="tab-btn" data-tab="monetization">수익화</button>
+        <button class="tab-btn" data-tab="growth">마케팅 & 로드맵</button>
+    </nav>
+
+    <section class="tab-panel active" id="panel-overview">
+        <h2>서비스 개요</h2>
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="number">3,000만</div>
+                <div class="label">토스 유저 풀</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">3초</div>
+                <div class="label">첫 추천까지</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">0원</div>
+                <div class="label">음원 라이선스</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">4주</div>
+                <div class="label">MVP 출시</div>
+            </div>
+        </div>
+
+        <div class="card card-accent">
+            <h4>핵심 가치 제안</h4>
+            <p>화면에 떠다니는 감정 키워드를 2~4개 선택하면, AI가 조합을 분석하여 YouTube Music에서 딱 맞는 플레이리스트를 생성합니다. 앱 설치 없이 토스 안에서 즉시 실행.</p>
+        </div>
+
+        <h3>타겟 유저</h3>
+        <ul>
+            <li>음악은 듣고 싶은데 뭘 들을지 모르겠는 20~30대</li>
+            <li>기분 전환이 필요한 직장인 (출퇴근, 점심시간)</li>
+            <li>장르/아티스트 기반 추천에 피로감을 느끼는 유저</li>
+        </ul>
+
+        <h3>차별점</h3>
+        <table>
+            <thead><tr><th>기존 서비스</th><th>무드뮤직</th></tr></thead>
+            <tbody>
+                <tr><td>장르/아티스트 기반 추천</td><td>감정 키워드 조합 기반 추천</td></tr>
+                <tr><td>단일 무드 플레이리스트 (잔잔한, 신나는)</td><td>복합 감정 조합 (잔잔한 + 새벽 + 혼자)</td></tr>
+                <tr><td>별도 앱 설치 필요</td><td>토스 내 즉시 실행 (설치 0)</td></tr>
+                <tr><td>구독 모델 중심</td><td>무료 + 광고 기반 (프리미엄 옵션)</td></tr>
+            </tbody>
+        </table>
+
+        <h2>앱인토스 플랫폼 적합성</h2>
+        <table>
+            <thead><tr><th>항목</th><th>판정</th><th>근거</th></tr></thead>
+            <tbody>
+                <tr><td>제한 카테고리</td><td><span class="badge badge-ok">통과</span></td><td>금융/사행성/의료 해당 없음</td></tr>
+                <tr><td>생성형 AI 정책</td><td><span class="badge badge-warn">준수 필요</span></td><td>LLM 키워드 확장 시 고지/라벨 의무</td></tr>
+                <tr><td>iframe 제한</td><td><span class="badge badge-ok">예외 허용</span></td><td>YouTube 영상 삽입은 유일한 예외</td></tr>
+                <tr><td>로그인</td><td><span class="badge badge-ok">토스 로그인</span></td><td>유저 식별키로 히스토리 저장</td></tr>
+                <tr><td>결제</td><td><span class="badge badge-ok">인앱결제</span></td><td>프리미엄 구독은 디지털 상품</td></tr>
+                <tr><td>광고</td><td><span class="badge badge-ok">AdMob</span></td><td>앱인토스 전면형/보상형/배너 사용</td></tr>
+            </tbody>
+        </table>
+
+        <div class="card card-olive">
+            <h4>핵심 발견</h4>
+            <p>앱인토스는 iframe을 금지하지만 <strong>YouTube 영상 삽입은 유일한 예외</strong>. 이 서비스의 핵심 재생 기능이 플랫폼 정책과 완벽히 맞아떨어짐.</p>
+        </div>
+    </section>
+    <section class="tab-panel" id="panel-features">
+        <h2>핵심 기능 아이디어</h2>
+        <p>PM, Designer, Engineer 3개 관점에서 도출한 아이디어 중 우선순위 Top 5를 선정했습니다.</p>
+
+        <div class="perspective-grid">
+            <div class="perspective-card">
+                <h4>Product Manager</h4>
+                <ol>
+                    <li>감정 조합 추천 엔진 (2~4개 키워드 조합)</li>
+                    <li>일기형 감정 캘린더 히스토리</li>
+                    <li>시간대/날씨 자동 키워드 제안</li>
+                    <li>소셜 무드 매칭 (같은 기분 유저)</li>
+                    <li>B2B 공간 무드 큐레이션</li>
+                </ol>
+            </div>
+            <div class="perspective-card">
+                <h4>Product Designer</h4>
+                <ol>
+                    <li>플로팅 버블 UI (물리 시뮬레이션)</li>
+                    <li>제로 온보딩 (3초 안에 첫 추천)</li>
+                    <li>컬러 무드 시스템 (감정 색상 매핑)</li>
+                    <li>흔들어서 리셋 (기분 전환 메타포)</li>
+                    <li>미니 리액션 피드백 (3단계)</li>
+                </ol>
+            </div>
+            <div class="perspective-card">
+                <h4>Software Engineer</h4>
+                <ol>
+                    <li>키워드-오디오 임베딩 매핑 (CLAP)</li>
+                    <li>YouTube iframe 재생 (앱인토스 예외)</li>
+                    <li>엣지 추론 경량 모델 (ONNX)</li>
+                    <li>실시간 협업 필터링 (WebSocket)</li>
+                    <li>LLM 키워드 자동 확장 + 캐싱</li>
+                </ol>
+            </div>
+        </div>
+
+        <h2>우선순위 Top 5</h2>
+        <table>
+            <thead><tr><th>#</th><th>아이디어</th><th>출처</th><th>선정 이유</th></tr></thead>
+            <tbody>
+                <tr><td><span class="badge badge-clay">1</span></td><td>플로팅 버블 UI + 제로 온보딩</td><td>Designer</td><td>서비스 존재 이유. 키워드 선택 경험 자체가 핵심 가치</td></tr>
+                <tr><td><span class="badge badge-clay">2</span></td><td>감정 조합 추천 엔진</td><td>PM</td><td>단일 감정 태그는 이미 존재. 조합이 차별점</td></tr>
+                <tr><td><span class="badge badge-clay">3</span></td><td>YouTube iframe 재생</td><td>Engineer</td><td>앱인토스 예외 허용. 음원 비용 0원으로 즉시 검증</td></tr>
+                <tr><td><span class="badge badge-clay">4</span></td><td>보상형 광고 기반 프리미엄 모델</td><td>PM</td><td>앱인토스 AdMob SDK로 자연스러운 수익화</td></tr>
+                <tr><td><span class="badge badge-clay">5</span></td><td>공유 리워드 + 토스 포인트</td><td>PM</td><td>앱인토스 마케팅 도구로 바이럴 루프 구축</td></tr>
+            </tbody>
+        </table>
+
+        <h3>핵심 가정 & 검증 방법</h3>
+        <div class="card">
+            <h4>1. 플로팅 버블 UI</h4>
+            <p><strong>가정</strong>: 키워드가 떠다니는 인터랙션이 재미있어서 선택 행위 자체가 즐거울 것</p>
+            <p><strong>검증</strong>: 프로토타입 → 5명 사용성 테스트. "3초 안에 뭘 해야 하는지 알겠는가?" 측정</p>
+            <p><strong>리스크</strong>: 모바일 물리 시뮬레이션 성능. TDS 컴포넌트와 조화</p>
+        </div>
+        <div class="card">
+            <h4>2. 감정 조합 추천 엔진</h4>
+            <p><strong>가정</strong>: 2~4개 키워드 조합이 단일 키워드보다 만족도 높은 추천을 만들 것</p>
+            <p><strong>검증</strong>: 단일 vs 조합 A/B 테스트. "이 곡이 내 기분에 맞나요?" 5점 척도</p>
+            <p><strong>리스크</strong>: 조합 경우의 수 폭발 → 캐싱 전략 필수</p>
+        </div>
+        <div class="card">
+            <h4>3. YouTube iframe 재생</h4>
+            <p><strong>가정</strong>: YouTube 검색 결과가 감정 기반 필터링에 충분한 품질을 제공할 것</p>
+            <p><strong>검증</strong>: 50개 키워드 조합 → 검색 결과 품질 평가 (적합도 70% 이상)</p>
+            <p><strong>리스크</strong>: API quota 일 10,000 units. 백그라운드 재생 제한</p>
+        </div>
+    </section>
+    <section class="tab-panel" id="panel-architecture">
+        <h2>시스템 아키텍처</h2>
+
+        <div class="flow-diagram">
+            <div class="flow-row">
+                <div class="flow-box highlight">키워드 선택 (2~4개)</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">LLM 키워드 확장</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">YouTube 검색 쿼리 생성</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box">YouTube Data API v3</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-box highlight">iframe 재생</div>
+            </div>
+        </div>
+
+        <div class="card card-accent">
+            <h4>핵심 설계 원칙</h4>
+            <p>Spotify는 오디오 피처(수치)로 매칭하지만, YouTube는 <strong>텍스트 기반 검색</strong>에 의존합니다. 따라서 LLM의 키워드→검색쿼리 변환 품질이 추천 정밀도를 좌우합니다.</p>
+        </div>
+
+        <h3>기술 스택</h3>
+        <table>
+            <thead><tr><th>레이어</th><th>선택</th><th>이유</th></tr></thead>
+            <tbody>
+                <tr><td>프레임워크</td><td>Web (WebView) — Vite 기반</td><td>가장 빠른 시작, 앱인토스 기본</td></tr>
+                <tr><td>디자인</td><td>TDS + 커스텀 버블 UI</td><td>토스 일관성 + 차별화 인터랙션</td></tr>
+                <tr><td>SDK</td><td><code>@apps-in-toss/web-framework</code></td><td>광고/결제/로그인 통합</td></tr>
+                <tr><td>로그인</td><td>토스 로그인 → 유저 식별키</td><td>플랫폼 정책 (유일한 옵션)</td></tr>
+                <tr><td>저장</td><td>Storage API</td><td>감정 히스토리, 좋아요 곡</td></tr>
+                <tr><td>재생</td><td>YouTube iframe</td><td>앱인토스 예외 허용</td></tr>
+                <tr><td>검색</td><td>YouTube Data API v3</td><td>무료 quota + 한국 음원 커버리지</td></tr>
+                <tr><td>AI</td><td>LLM 키워드 확장 (서버사이드)</td><td>결과 캐싱으로 레이턴시 최소화</td></tr>
+                <tr><td>광고</td><td>GoogleAdMob via SDK</td><td>전면형/보상형/배너</td></tr>
+                <tr><td>결제</td><td>인앱결제</td><td>프리미엄 구독 (디지털 상품)</td></tr>
+            </tbody>
+        </table>
+
+        <h3>YouTube API 제약 대응</h3>
+        <table>
+            <thead><tr><th>문제</th><th>해결 전략</th></tr></thead>
+            <tbody>
+                <tr><td>오디오 피처 없음</td><td>LLM이 감정 키워드를 "lo-fi chill rain ambient" 같은 YouTube 최적화 쿼리로 변환</td></tr>
+                <tr><td>검색 결과 노이즈</td><td><code>videoCategoryId=10</code> (Music) 필터 + <code>topicId</code> 활용</td></tr>
+                <tr><td>백그라운드 재생 제한</td><td>PWA 오디오 모드 or YouTube Music Premium 유도</td></tr>
+                <tr><td>Quota 제한 (일 10,000 units)</td><td>인기 키워드 조합 결과 캐싱. 동일 조합은 캐시 히트</td></tr>
+            </tbody>
+        </table>
+
+        <h3>생성형 AI 정책 준수</h3>
+        <div class="card">
+            <table>
+                <thead><tr><th>의무</th><th>구현 방법</th></tr></thead>
+                <tbody>
+                    <tr><td>사전 고지</td><td>최초 이용 시 바텀시트: "AI를 활용하여 키워드를 분석하고 음악을 추천합니다"</td></tr>
+                    <tr><td>결과물 표시</td><td>추천 플레이리스트 상단에 <code>🤖 AI 추천</code> 배지</td></tr>
+                </tbody>
+            </table>
+            <p><span class="badge badge-warn">위반 시 최대 3,000만 원 과태료</span></p>
+        </div>
+    </section>
+    <section class="tab-panel" id="panel-monetization">
+        <h2>수익화 전략</h2>
+
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="number">60%</div>
+                <div class="label">보상형 광고</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">20%</div>
+                <div class="label">배너 광고</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">20%</div>
+                <div class="label">인앱결제</div>
+            </div>
+        </div>
+
+        <h3>수익 모델 구조</h3>
+        <div class="card">
+            <h4>무료 유저 (광고 기반)</h4>
+            <ul>
+                <li><strong>보상형 광고</strong>: 추천 새로고침 시 시청 → 새 플레이리스트 생성</li>
+                <li><strong>배너 광고</strong>: 플레이어 하단 고정</li>
+                <li><strong>전면형 광고</strong>: 3번째 키워드 조합마다 자연스럽게 노출</li>
+                <li>일 5회 키워드 조합 제한</li>
+            </ul>
+        </div>
+        <div class="card card-olive">
+            <h4>프리미엄 유저 (인앱결제 · 월 1,900~2,900원)</h4>
+            <ul>
+                <li>광고 완전 제거</li>
+                <li>무제한 키워드 조합</li>
+                <li>감정 캘린더 풀 히스토리</li>
+                <li>프리미엄 키워드 팩 (계절/상황별)</li>
+            </ul>
+        </div>
+
+        <h3>광고 노출 타이밍 설계</h3>
+        <blockquote>앱인토스 다크패턴 방지 정책을 100% 준수하는 광고 배치</blockquote>
+        <table>
+            <thead><tr><th>허용 (자연스러운 시점)</th><th>금지 (다크패턴)</th></tr></thead>
+            <tbody>
+                <tr><td>키워드 선택 완료 → 추천 생성 대기 중 전면 광고</td><td>키워드 선택 중간에 갑자기 광고</td></tr>
+                <tr><td>플레이리스트 끝난 후 "더 듣기" 전 보상형 광고</td><td>곡 재생 중 갑자기 전면 광고</td></tr>
+                <tr><td>플레이어 하단 배너 (항상 고정)</td><td>인트로/로딩 화면에 광고</td></tr>
+                <tr><td>감정 캘린더 열기 전 보상형 광고 (무료 유저)</td><td>팝업/바텀시트로 광고 강제</td></tr>
+            </tbody>
+        </table>
+
+        <h3>수익화 채널별 구현</h3>
+        <table>
+            <thead><tr><th>채널</th><th>SDK</th><th>적용 위치</th></tr></thead>
+            <tbody>
+                <tr><td>보상형 광고</td><td><code>GoogleAdMob.loadAppsInTossAdMob()</code></td><td>"새로운 추천 받기" 버튼</td></tr>
+                <tr><td>전면형 광고</td><td><code>GoogleAdMob.showAppsInTossAdMob()</code></td><td>3회차 조합 후 로딩 화면</td></tr>
+                <tr><td>배너 광고</td><td>AdMob 배너 컴포넌트</td><td>플레이어 화면 하단 고정</td></tr>
+                <tr><td>인앱결제</td><td>앱인토스 인앱결제 SDK</td><td>설정 > 프리미엄 구독</td></tr>
+            </tbody>
+        </table>
+
+        <div class="card card-accent">
+            <h4>광고 적용 필수 규칙 (앱인토스 정책)</h4>
+            <ul>
+                <li>인트로/로딩/컷신/팝업 모달에 노출 금지</li>
+                <li>사전 로딩 필수 (실시간 로딩 금지)</li>
+                <li>배너 광고는 상단/하단에만 위치</li>
+                <li>광고 재생 시 미니앱 음악 일시 정지</li>
+                <li>보상형 광고 시청 완료 → 보상 즉시 지급</li>
+            </ul>
+        </div>
+    </section>
+    <section class="tab-panel" id="panel-growth">
+        <h2>마케팅 전략</h2>
+        <p>앱인토스 내장 마케팅 도구를 최대한 활용하여 유입 → 리텐션 → 바이럴 루프를 구축합니다.</p>
+
+        <table>
+            <thead><tr><th>도구</th><th>활용 방법</th><th>목표</th></tr></thead>
+            <tbody>
+                <tr><td>푸시/스마트 발송</td><td>"비 오는 저녁이에요. 오늘 기분에 맞는 노래 들어볼까요?" — 날씨/시간 기반 세그먼트</td><td>리텐션</td></tr>
+                <tr><td>토스 포인트 프로모션</td><td>첫 키워드 조합 완료 시 토스 포인트 지급</td><td>초기 유입</td></tr>
+                <tr><td>공유 리워드</td><td>"내 감정 플레이리스트 공유" → 양쪽 프리미엄 키워드 1팩</td><td>바이럴</td></tr>
+                <tr><td>세그먼트</td><td>활성(주 3회+) / 이탈 위험(7일 미접속) / 전환 가능(한도 도달)</td><td>타겟팅</td></tr>
+                <tr><td>OG 이미지</td><td>선택 키워드 조합 + 컬러 그라데이션 동적 생성</td><td>공유 임팩트</td></tr>
+                <tr><td>분석 대시보드</td><td>인기 키워드 조합, 시간대별 사용 패턴, 전환율 추적</td><td>인사이트</td></tr>
+            </tbody>
+        </table>
+
+        <h2>MVP 로드맵 (4주)</h2>
+        <div class="roadmap">
+            <div class="roadmap-phase">
+                <h4>Week 1: 기획 & 기반</h4>
+                <ul>
+                    <li>앱인토스 콘솔 앱 등록 + 승인 대기 (1~2 영업일)</li>
+                    <li>TDS 기반 플로팅 버블 UI 프로토타입</li>
+                    <li>키워드 목록 설계 (감정/상황/날씨 30~50개)</li>
+                    <li>프로젝트 생성: <code>npx create-ait-app mood-music</code></li>
+                </ul>
+            </div>
+            <div class="roadmap-phase">
+                <h4>Week 2: 핵심 기능</h4>
+                <ul>
+                    <li>YouTube Data API v3 연동</li>
+                    <li>LLM 키워드 확장 로직 (서버사이드 + 캐싱)</li>
+                    <li>YouTube iframe 플레이어 통합</li>
+                    <li>키워드 → 검색쿼리 변환 품질 테스트</li>
+                </ul>
+            </div>
+            <div class="roadmap-phase">
+                <h4>Week 3: 연동 & 수익화</h4>
+                <ul>
+                    <li>토스 로그인 + 유저 식별키 + Storage API</li>
+                    <li>인앱 광고 연동 (보상형 + 배너 + 전면형)</li>
+                    <li>인앱결제 연동 (프리미엄 구독)</li>
+                    <li>감정 히스토리 저장/조회</li>
+                </ul>
+            </div>
+            <div class="roadmap-phase">
+                <h4>Week 4: 출시 준비</h4>
+                <ul>
+                    <li>날씨/시간 API 연동 (키워드 자동 제안)</li>
+                    <li>AI 고지 UI 구현 (바텀시트 + 배지)</li>
+                    <li>출시 체크리스트 전수 확인</li>
+                    <li><code>.ait</code> 빌드 → 실기기 테스트 → 검수 요청</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>성공 지표 (출시 후 4주)</h3>
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="number">DAU 1,000+</div>
+                <div class="label">일간 활성 유저</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">D7 30%+</div>
+                <div class="label">7일 리텐션</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">70%+</div>
+                <div class="label">추천 만족도</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">3%+</div>
+                <div class="label">프리미엄 전환율</div>
+            </div>
+        </div>
+
+        <div class="card card-accent">
+            <h4>핵심 검증 질문</h4>
+            <p>"키워드 3개 고르면 만족스러운 곡이 나오는가?" — 이것만 검증되면 나머지는 그로스.</p>
+        </div>
+    </section>
+</div>
+<script>
+(function() {
+    var btns = document.querySelectorAll('.tab-btn');
+    var panels = document.querySelectorAll('.tab-panel');
+    btns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var target = btn.getAttribute('data-tab');
+            btns.forEach(function(b) { b.classList.remove('active'); });
+            panels.forEach(function(p) { p.classList.remove('active'); });
+            btn.classList.add('active');
+            document.getElementById('panel-' + target).classList.add('active');
+        });
+    });
+})();
+</script>
+</body>
+</html>
