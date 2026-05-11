@@ -4,3 +4,8 @@ node_modules/
 dist/
 .env
 .env.local
+*.log
+
+# Build outputs
+apps/client/dist/
+apps/server/dist/
