@@ -1,0 +1,12 @@
+PASS src/modules/youtube/youtube.service.spec.ts
+  YouTubeService
+    search
+      ✓ should return search results (6 ms)
+      ✓ should return cached result on second call (1 ms)
+      ✓ should return empty array on no results (1 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        1.271 s
+Ran all test suites matching /youtube.service.spec/i.
