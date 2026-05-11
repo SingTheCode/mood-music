@@ -1,0 +1,11 @@
+PASS src/modules/feedback/feedback.service.spec.ts
+  FeedbackService
+    saveFeedback
+      ✓ should save feedback entry (6 ms)
+      ✓ should reject invalid reaction (4 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        1.244 s
+Ran all test suites matching /feedback.service.spec/i.
