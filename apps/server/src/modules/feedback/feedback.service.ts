@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BadRequestException } from '@nestjs/common';
-import type { FeedbackEntry, FeedbackReaction } from '@mood-music/shared-types';
+import type { FeedbackEntry } from '@mood-music/shared-types';
 
 /**
  * 피드백 서비스
@@ -13,28 +13,15 @@ export class FeedbackService {
 
   /**
    * 피드백을 저장합니다.
-   * @param userId 사용자 ID
    * @param feedback 피드백 데이터
    * @returns 저장된 피드백
    */
-  async saveFeedback(userId: string, feedback: FeedbackEntry): Promise<FeedbackEntry> {
+  async saveFeedback(feedback: FeedbackEntry): Promise<FeedbackEntry> {
     if (!this.VALID_REACTIONS.includes(feedback.reaction)) {
       throw new BadRequestException(`Invalid reaction: ${feedback.reaction}`);
     }
 
     this.feedbacks.push(feedback);
     return feedback;
-  }
-}
-
-
-    const entry: FeedbackEntry = {
-      id: crypto.randomUUID(),
-      ...feedback,
-      createdAt: Date.now(),
-    };
-
-    this.feedbacks.push(entry);
-    return entry;
   }
 }

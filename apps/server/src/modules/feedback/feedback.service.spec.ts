@@ -15,7 +15,7 @@ describe('FeedbackService', () => {
 
   describe('saveFeedback', () => {
     it('should save feedback entry', async () => {
-      const result = await service.saveFeedback('user-123', {
+      const result = await service.saveFeedback({
         keywords: ['잔잔한'],
         trackIds: ['video-123'],
         reaction: 'LIKE' as FeedbackReaction,
@@ -28,7 +28,7 @@ describe('FeedbackService', () => {
 
     it('should reject invalid reaction', async () => {
       await expect(
-        service.saveFeedback('user-123', {
+        service.saveFeedback({
           keywords: ['잔잔한'],
           trackIds: ['video-123'],
           reaction: 'INVALID' as any,
