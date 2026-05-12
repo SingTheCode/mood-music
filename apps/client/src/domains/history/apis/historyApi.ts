@@ -1,10 +1,8 @@
 import type { HistoryEntry, HistoryFilter } from '@/domains/history/types/entity';
+import { getAuthHeaders } from '@/shared/utils/authHeaders';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
-/**
- * Fetches history entries for the current user
- */
 export async function fetchHistory(filter?: HistoryFilter): Promise<HistoryEntry[]> {
   const params = new URLSearchParams();
   if (filter?.limit) {
@@ -16,10 +14,7 @@ export async function fetchHistory(filter?: HistoryFilter): Promise<HistoryEntry
 
   const response = await fetch(`${API_BASE_URL}/history?${params.toString()}`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-user-id': 'user-' + Math.random().toString(36).substr(2, 9),
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {
@@ -29,16 +24,10 @@ export async function fetchHistory(filter?: HistoryFilter): Promise<HistoryEntry
   return response.json();
 }
 
-/**
- * Saves a new history entry
- */
 export async function saveHistoryEntry(entry: Omit<HistoryEntry, 'id' | 'createdAt'>): Promise<HistoryEntry> {
   const response = await fetch(`${API_BASE_URL}/history`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-user-id': 'user-' + Math.random().toString(36).substr(2, 9),
-    },
+    headers: getAuthHeaders(),
     body: JSON.stringify(entry),
   });
 
@@ -49,15 +38,10 @@ export async function saveHistoryEntry(entry: Omit<HistoryEntry, 'id' | 'created
   return response.json();
 }
 
-/**
- * Deletes a history entry by ID
- */
 export async function deleteHistoryEntry(id: string): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/history/${id}`, {
     method: 'DELETE',
-    headers: {
-      'x-user-id': 'user-' + Math.random().toString(36).substr(2, 9),
-    },
+    headers: getAuthHeaders(),
   });
 
   if (!response.ok) {

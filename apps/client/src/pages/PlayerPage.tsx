@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { YouTubePlayer } from '@/domains/player/components/YouTubePlayer';
 import { PlaylistTrackList } from '@/domains/player/components/PlaylistTrackList';
@@ -6,7 +6,9 @@ import { usePlaylistSearch } from '@/domains/player/hooks/usePlaylistSearch';
 import { FeedbackReactions } from '@/domains/feedback/components/FeedbackReactions';
 import { AiBadge } from '@/shared/components/AiBadge';
 import { useHistory } from '@/domains/history/hooks/useHistory';
+import { useAudioControl } from '@/shared/hooks/useAudioControl';
 import { Skeleton } from '@/shared/components/ui/skeleton';
+import { logImpression } from '@/shared/utils/analytics';
 import type { FeedbackReaction } from '@/../../../packages/shared-types/src/feedback';
 
 export function PlayerPage() {
@@ -19,11 +21,23 @@ export function PlayerPage() {
 
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [selectedReaction, setSelectedReaction] = useState<FeedbackReaction | undefined>(undefined);
+  const [isPlayerPaused, setIsPlayerPaused] = useState(false);
   const hasSavedRef = useRef(false);
+
+  const handlePause = useCallback(() => {
+    setIsPlayerPaused(true);
+  }, []);
+
+  const handleResume = useCallback(() => {
+    setIsPlayerPaused(false);
+  }, []);
+
+  useAudioControl({ onPause: handlePause, onResume: handleResume });
 
   useEffect(() => {
     if (data?.tracks && data.tracks.length > 0 && !hasSavedRef.current) {
       hasSavedRef.current = true;
+      logImpression('playlist', { keywords: keywords.join(','), trackCount: data.tracks.length });
       saveEntry({
         keywords,
         tracks: data.tracks.map(track => ({
@@ -38,7 +52,7 @@ export function PlayerPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-6 gap-4">
         <p className="text-gray-500">선택된 키워드가 없습니다.</p>
-        <button onClick={() => navigate('/')} className="text-sm text-blue-600 hover:underline">
+        <button type="button" onClick={() => navigate('/')} className="text-sm text-blue-600 hover:underline">
           ← 다시 선택
         </button>
       </div>
@@ -64,7 +78,7 @@ export function PlayerPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-6 gap-4">
         <p className="text-gray-500">{isError ? '추천 결과를 불러오지 못했습니다.' : '추천 결과가 없습니다.'}</p>
-        <button onClick={() => navigate('/')} className="text-sm text-blue-600 hover:underline">
+        <button type="button" onClick={() => navigate('/')} className="text-sm text-blue-600 hover:underline">
           ← 다시 선택
         </button>
       </div>
@@ -76,13 +90,13 @@ export function PlayerPage() {
   return (
     <div className="flex flex-col gap-4 p-4 max-w-lg mx-auto pb-24">
       <div className="flex items-center justify-between">
-        <button onClick={() => navigate('/')} className="text-sm text-gray-600 hover:text-gray-900">
+        <button type="button" onClick={() => navigate('/')} className="text-sm text-gray-600 hover:text-gray-900">
           ← 다시 선택
         </button>
         <AiBadge />
       </div>
 
-      <YouTubePlayer tracks={tracks} currentTrackIndex={currentTrackIndex} />
+      <YouTubePlayer tracks={tracks} currentTrackIndex={currentTrackIndex} isPaused={isPlayerPaused} />
 
       <PlaylistTrackList tracks={tracks} currentTrackIndex={currentTrackIndex} onSelectTrack={setCurrentTrackIndex} />
 

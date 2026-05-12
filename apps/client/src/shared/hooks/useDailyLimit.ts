@@ -1,87 +1,82 @@
-import { useCallback, useState } from 'react';
-
+import { useCallback, useEffect, useState } from 'react';
+import { getUserKey } from '@/shared/hooks/useUserKey';
 import { useSubscription } from '@/shared/hooks/useSubscription';
 
-const DAILY_LIMIT_KEY = 'mood-music-daily-limit';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 const MAX_FREE_USES = 5;
 
-interface DailyLimitData {
-  /** 저장된 날짜 (YYYY-MM-DD) */
-  date: string;
-  /** 해당 날짜의 사용 횟수 */
+interface DailyLimitState {
   count: number;
+  date: string;
 }
 
-/** useDailyLimit 훅 반환 타입 */
 interface UseDailyLimitReturn {
-  /** 추천을 사용할 수 있는지 여부 */
   canUse: boolean;
-  /** 남은 사용 횟수 (PREMIUM은 Infinity) */
   remaining: number;
-  /** 사용 횟수 1 증가 */
-  increment: () => void;
-  /** 보상형 광고 완료 후 1회 추가 */
+  increment: () => Promise<void>;
   addRewardedUse: () => void;
-  /** 프리미엄 유저 여부 */
   isPremium: boolean;
+  isLoading: boolean;
 }
 
 function getToday(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function loadFromStorage(): DailyLimitData {
-  try {
-    const stored = localStorage.getItem(DAILY_LIMIT_KEY);
-    if (stored) {
-      const parsed = JSON.parse(stored) as DailyLimitData;
-      if (parsed.date === getToday()) {
-        return parsed;
-      }
-    }
-  } catch {
-    // 파싱 실패 시 초기값 반환
-  }
-  return { date: getToday(), count: 0 };
-}
-
-function saveToStorage(data: DailyLimitData): void {
-  localStorage.setItem(DAILY_LIMIT_KEY, JSON.stringify(data));
-}
-
-/**
- * 일일 사용 제한 관리 훅
- * FREE 유저는 일 5회 제한, PREMIUM 유저는 무제한
- */
 export function useDailyLimit(): UseDailyLimitReturn {
   const { isPremium } = useSubscription();
-  const [data, setData] = useState<DailyLimitData>(loadFromStorage);
+  const [state, setState] = useState<DailyLimitState>({ count: 0, date: getToday() });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const userKey = getUserKey();
+    if (!userKey) {
+      setIsLoading(false);
+      return undefined;
+    }
+
+    fetch(`${API_BASE_URL}/daily-limit?date=${getToday()}`, {
+      headers: { 'x-user-id': userKey },
+    })
+      .then(res => res.json())
+      .then((data: DailyLimitState) => {
+        setState(data);
+      })
+      .catch(() => {
+        setState({ count: 0, date: getToday() });
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const today = getToday();
-  const isToday = data.date === today;
-  const count = isToday ? data.count : 0;
+  const count = state.date === today ? state.count : 0;
   const remaining = isPremium ? Infinity : Math.max(0, MAX_FREE_USES - count);
   const canUse = isPremium || remaining > 0;
 
-  const increment = useCallback(() => {
-    setData(prev => {
-      const currentToday = getToday();
-      const currentCount = prev.date === currentToday ? prev.count : 0;
-      const next: DailyLimitData = { date: currentToday, count: currentCount + 1 };
-      saveToStorage(next);
-      return next;
-    });
-  }, []);
+  const increment = useCallback(async () => {
+    const userKey = getUserKey();
+    if (!userKey) {
+      return;
+    }
+
+    const newCount = count + 1;
+    setState({ count: newCount, date: getToday() });
+
+    await fetch(`${API_BASE_URL}/daily-limit/increment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-id': userKey,
+      },
+    }).catch(() => {});
+  }, [count]);
 
   const addRewardedUse = useCallback(() => {
-    setData(prev => {
-      const currentToday = getToday();
-      const currentCount = prev.date === currentToday ? prev.count : 0;
-      const next: DailyLimitData = { date: currentToday, count: Math.max(0, currentCount - 1) };
-      saveToStorage(next);
-      return next;
-    });
+    setState(prev => ({
+      ...prev,
+      count: Math.max(0, prev.count - 1),
+    }));
   }, []);
 
-  return { canUse, remaining, increment, addRewardedUse, isPremium };
+  return { canUse, remaining, increment, addRewardedUse, isPremium, isLoading };
 }

@@ -38,5 +38,8 @@
   },
   "engines": {
     "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "@apps-in-toss/web-framework": "^2.5.0"
   }
 }

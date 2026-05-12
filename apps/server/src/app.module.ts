@@ -4,6 +4,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { KeywordModule } from './modules/keyword/keyword.module';
 import { YoutubeModule } from './modules/youtube/youtube.module';
 import { HistoryModule } from './modules/history/history.module';
+import { DailyLimitModule } from './modules/daily-limit/daily-limit.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -16,6 +17,7 @@ import configuration from './config/configuration';
     KeywordModule,
     YoutubeModule,
     HistoryModule,
+    DailyLimitModule,
   ],
 })
 export class AppModule {}

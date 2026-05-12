@@ -2,13 +2,12 @@ import { Button } from '@/shared/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/shared/components/ui/sheet';
 import { useAiDisclosure } from '@/shared/hooks/useAiDisclosure';
 
-/**
- * AI disclosure bottom sheet component
- * Displays mandatory AI usage disclosure on first visit per apps-in-toss policy
- * Cannot be dismissed without explicit user confirmation
- */
 export function AiDisclosureSheet() {
-  const { isDisclosed, confirm } = useAiDisclosure();
+  const { isDisclosed, isLoading, confirm } = useAiDisclosure();
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <Sheet open={!isDisclosed}>

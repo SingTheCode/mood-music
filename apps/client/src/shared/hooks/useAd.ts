@@ -1,43 +1,94 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { GoogleAdMob } from '@apps-in-toss/web-framework';
 
-import { adSdk } from '@/shared/utils/adSdkMock';
+const REWARDED_AD_GROUP_ID = import.meta.env.VITE_REWARDED_AD_GROUP_ID || '';
+const INTERSTITIAL_AD_GROUP_ID = import.meta.env.VITE_INTERSTITIAL_AD_GROUP_ID || '';
 
-/**
- * 광고 관리 훅 반환 타입
- */
 interface UseAdReturn {
-  /** 보상형 광고 로드 완료 여부 */
   isAdLoaded: boolean;
-  /** 보상형 광고 사전 로딩 */
-  loadRewardedAd: () => Promise<void>;
-  /** 보상형 광고 표시 → 보상 지급 여부 반환 */
+  loadRewardedAd: () => void;
   showRewardedAd: () => Promise<boolean>;
-  /** 전면 광고 표시 */
   showInterstitialAd: () => Promise<void>;
 }
 
 export function useAd(): UseAdReturn {
   const [isAdLoaded, setIsAdLoaded] = useState(false);
+  const cleanupRef = useRef<(() => void) | null>(null);
 
-  const loadRewardedAd = useCallback(async () => {
-    const loaded = await adSdk.loadRewardedAd();
-    setIsAdLoaded(loaded);
+  const loadRewardedAd = useCallback(() => {
+    cleanupRef.current?.();
+
+    cleanupRef.current = GoogleAdMob.loadAppsInTossAdMob({
+      options: { adGroupId: REWARDED_AD_GROUP_ID },
+      onEvent: event => {
+        if (event.type === 'loaded') {
+          setIsAdLoaded(true);
+        }
+      },
+      onError: () => {
+        setIsAdLoaded(false);
+      },
+    });
   }, []);
 
-  const showRewardedAd = useCallback(async (): Promise<boolean> => {
-    const result = await adSdk.showRewardedAd();
-    setIsAdLoaded(false);
-    loadRewardedAd();
-    return result.rewarded;
+  const showRewardedAd = useCallback((): Promise<boolean> => {
+    return new Promise(resolve => {
+      setIsAdLoaded(false);
+
+      GoogleAdMob.showAppsInTossAdMob({
+        options: { adGroupId: REWARDED_AD_GROUP_ID },
+        onEvent: event => {
+          switch (event.type) {
+            case 'userEarnedReward':
+              resolve(true);
+              break;
+            case 'dismissed':
+              resolve(false);
+              loadRewardedAd();
+              break;
+          }
+        },
+        onError: () => {
+          resolve(false);
+          loadRewardedAd();
+        },
+      });
+    });
   }, [loadRewardedAd]);
 
-  const showInterstitialAd = useCallback(async (): Promise<void> => {
-    await adSdk.loadInterstitialAd();
-    await adSdk.showInterstitialAd();
+  const showInterstitialAd = useCallback((): Promise<void> => {
+    return new Promise(resolve => {
+      const cleanup = GoogleAdMob.loadAppsInTossAdMob({
+        options: { adGroupId: INTERSTITIAL_AD_GROUP_ID },
+        onEvent: event => {
+          if (event.type === 'loaded') {
+            cleanup();
+            GoogleAdMob.showAppsInTossAdMob({
+              options: { adGroupId: INTERSTITIAL_AD_GROUP_ID },
+              onEvent: showEvent => {
+                if (showEvent.type === 'dismissed') {
+                  resolve();
+                }
+              },
+              onError: () => {
+                resolve();
+              },
+            });
+          }
+        },
+        onError: () => {
+          cleanup();
+          resolve();
+        },
+      });
+    });
   }, []);
 
   useEffect(() => {
     loadRewardedAd();
+    return () => {
+      cleanupRef.current?.();
+    };
   }, [loadRewardedAd]);
 
   return {

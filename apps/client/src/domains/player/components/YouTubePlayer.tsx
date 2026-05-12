@@ -1,17 +1,17 @@
 import type { Track } from '@/domains/player/types/entity';
 
 interface YouTubePlayerProps {
-  /** Array of tracks to play */
   tracks: Track[];
-  /** Index of currently playing track */
   currentTrackIndex: number;
+  isPaused?: boolean;
 }
 
-export function YouTubePlayer({ tracks, currentTrackIndex }: YouTubePlayerProps) {
+export function YouTubePlayer({ tracks, currentTrackIndex, isPaused = false }: YouTubePlayerProps) {
   const currentTrack = tracks[currentTrackIndex];
   const videoId = currentTrack?.videoId || '';
 
-  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1`;
+  const autoplay = isPaused ? 0 : 1;
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=${autoplay}&controls=1&enablejsapi=1`;
 
   return (
     <div className="w-full bg-black rounded-lg overflow-hidden">

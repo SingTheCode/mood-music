@@ -8,6 +8,7 @@ import { KEYWORDS } from '@/domains/keyword/constants/keywords';
 import { Button } from '@/shared/components/ui/button';
 import { useDailyLimit } from '@/shared/hooks/useDailyLimit';
 import { useAd } from '@/shared/hooks/useAd';
+import { logPress } from '@/shared/utils/analytics';
 import type { BubblePhysicsConfig, CanvasDimensions } from '@/domains/keyword/types/entity';
 
 const BUBBLE_CONFIG: BubblePhysicsConfig = {
@@ -34,8 +35,10 @@ export function HomePage() {
   );
 
   const handleRecommend = async () => {
+    logPress('recommend_button', { keywords: state.selected.join(','), canUse });
+
     if (canUse) {
-      increment();
+      await increment();
       navigate('/player', { state: { keywords: state.selected } });
       return;
     }
@@ -43,7 +46,7 @@ export function HomePage() {
     const rewarded = await showRewardedAd();
     if (rewarded) {
       addRewardedUse();
-      increment();
+      await increment();
       navigate('/player', { state: { keywords: state.selected } });
     }
   };

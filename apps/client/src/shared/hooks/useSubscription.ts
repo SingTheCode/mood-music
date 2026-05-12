@@ -1,57 +1,65 @@
-import { useCallback, useState } from 'react';
-
+import { useCallback, useEffect, useState } from 'react';
+import { IAP } from '@apps-in-toss/web-framework';
 import { SubscriptionTier } from '@mood-music/shared-types';
 
-import { paymentSdk } from '@/shared/utils/paymentSdkMock';
-
-const STORAGE_KEY = 'mood-music-subscription';
 const PREMIUM_PRODUCT_ID = 'mood-music-premium-monthly';
 
-/** useSubscription 훅 반환 타입 */
 interface UseSubscriptionReturn {
-  /** 현재 구독 티어 */
   tier: SubscriptionTier;
-  /** 프리미엄 구독 여부 */
   isPremium: boolean;
-  /** 결제 진행 중 여부 */
   isSubscribing: boolean;
-  /** 프리미엄 구독 결제 실행 */
   subscribe: () => Promise<void>;
+  restore: () => Promise<void>;
 }
 
-function getStoredTier(): SubscriptionTier {
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored === SubscriptionTier.PREMIUM) {
-    return SubscriptionTier.PREMIUM;
-  }
-  return SubscriptionTier.FREE;
-}
-
-/**
- * 구독 상태 관리 훅
- * localStorage 기반으로 구독 티어를 관리하고 결제 SDK를 호출한다
- */
 export function useSubscription(): UseSubscriptionReturn {
-  const [tier, setTier] = useState<SubscriptionTier>(getStoredTier);
+  const [tier, setTier] = useState<SubscriptionTier>(SubscriptionTier.FREE);
   const [isSubscribing, setIsSubscribing] = useState(false);
+
+  const restore = useCallback((): Promise<void> => {
+    return IAP.getCompletedOrRefundedOrders()
+      .then(result => {
+        const hasActivePremium = result.orders.some(
+          order => order.sku === PREMIUM_PRODUCT_ID && order.status === 'COMPLETED',
+        );
+        setTier(hasActivePremium ? SubscriptionTier.PREMIUM : SubscriptionTier.FREE);
+      })
+      .catch(() => {});
+  }, []);
 
   const subscribe = useCallback(async () => {
     setIsSubscribing(true);
-    try {
-      const result = await paymentSdk.purchase(PREMIUM_PRODUCT_ID);
-      if (result.success) {
-        localStorage.setItem(STORAGE_KEY, SubscriptionTier.PREMIUM);
-        setTier(SubscriptionTier.PREMIUM);
-      }
-    } finally {
-      setIsSubscribing(false);
-    }
+    return new Promise<void>(resolve => {
+      IAP.createSubscriptionPurchaseOrder({
+        options: {
+          sku: PREMIUM_PRODUCT_ID,
+          offerId: null,
+          processProductGrant: async () => true,
+        },
+        onEvent: event => {
+          if (event.type === 'success') {
+            setTier(SubscriptionTier.PREMIUM);
+          }
+          setIsSubscribing(false);
+          resolve();
+        },
+        onError: () => {
+          setIsSubscribing(false);
+          resolve();
+        },
+      });
+    });
   }, []);
+
+  useEffect(() => {
+    restore();
+  }, [restore]);
 
   return {
     tier,
     isPremium: tier === SubscriptionTier.PREMIUM,
     isSubscribing,
     subscribe,
+    restore,
   };
 }
